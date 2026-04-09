@@ -139,7 +139,7 @@ class DeepLinkOrchestrator {
       }
     } catch (error, stackTrace) {
       _logger.error(
-        message: 'Failed to process deep link: $error',
+        message: 'Failed to process deep link: ${intent.uri}',
         stackTrace: stackTrace,
         error: error,
       );
