@@ -8,10 +8,10 @@ version: 1.0.0
 repository: https://github.com/huraira-younas/flutter_deep_links
 
 topics:
+  - universal-links
   - deep-linking
   - navigation
   - app-links
-  - universal-links
 
 environment:
   sdk: ^3.10.0
