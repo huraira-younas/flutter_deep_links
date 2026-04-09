@@ -1,0 +1,7 @@
+analyzer:
+  language:
+    strict-raw-types: true
+    strict-inference: true
+    strict-casts: true
+  errors:
+    todo: ignore

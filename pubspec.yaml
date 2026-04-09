@@ -1,0 +1,23 @@
+name: flutter_deep_links
+description: >
+  A modular, type-safe deep link orchestration package for Flutter.
+  Handles validation, deduplication, authentication gating,
+  and dispatching with pluggable sources, policies, and handlers.
+version: 1.0.0
+# TODO: replace with your actual repository URL before publishing
+repository: https://github.com/user/flutter_deep_links
+
+topics:
+  - deep-linking
+  - navigation
+  - app-links
+  - universal-links
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.41.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  app_links: ^7.0.0

@@ -1,0 +1,12 @@
+name: flutter_deep_links_example
+description: Example app demonstrating flutter_deep_links usage.
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_deep_links:
+    path: ../
