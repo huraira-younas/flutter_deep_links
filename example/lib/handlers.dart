@@ -12,10 +12,10 @@ class ProfileHandler extends DeepLinkHandler {
   bool canHandle(DeepLinkIntent intent) => intent is ProfileIntent;
 
   @override
-  Future<void> handle(
-    DeepLinkIntent intent,
-    DeepLinkHandlerContext context,
-  ) async {
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     final profile = intent as ProfileIntent;
     debugPrint('[ProfileHandler] Navigating to user: ${profile.userId}');
     onNavigate(profile.userId);
@@ -34,10 +34,10 @@ class InviteHandler extends DeepLinkHandler {
   bool canHandle(DeepLinkIntent intent) => intent is InviteIntent;
 
   @override
-  Future<void> handle(
-    DeepLinkIntent intent,
-    DeepLinkHandlerContext context,
-  ) async {
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     final invite = intent as InviteIntent;
     debugPrint('[InviteHandler] Accepting invite: ${invite.inviteCode}');
     onInvite(invite.inviteCode);
@@ -53,10 +53,10 @@ class SettingsHandler extends DeepLinkHandler {
   bool canHandle(DeepLinkIntent intent) => intent is SettingsIntent;
 
   @override
-  Future<void> handle(
-    DeepLinkIntent intent,
-    DeepLinkHandlerContext context,
-  ) async {
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     final settings = intent as SettingsIntent;
     debugPrint('[SettingsHandler] Opening settings: ${settings.section ?? "root"}');
     onNavigate(settings.section);

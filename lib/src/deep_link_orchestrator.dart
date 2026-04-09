@@ -117,10 +117,10 @@ class DeepLinkOrchestrator {
       }
 
       final resolved = _intentResolver?.call(intent) ?? intent;
-
+      
       final handled = await _dispatcher.dispatch(
-        resolved,
-        DeepLinkHandlerContext(
+        intent: resolved,
+        context: DeepLinkHandlerContext(
           pendingStore: _pendingStore,
           authPolicy: _authPolicy,
           sharedData: sharedData,

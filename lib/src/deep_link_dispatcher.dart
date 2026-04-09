@@ -4,7 +4,7 @@ import 'deep_link_intent.dart';
 
 class DeepLinkDispatcher {
   DeepLinkDispatcher({List<DeepLinkHandler>? handlers})
-      : _handlers = handlers ?? <DeepLinkHandler>[];
+    : _handlers = handlers ?? <DeepLinkHandler>[];
 
   final List<DeepLinkHandler> _handlers;
 
@@ -12,10 +12,10 @@ class DeepLinkDispatcher {
     _handlers.add(handler);
   }
 
-  Future<bool> dispatch(
-    DeepLinkIntent intent,
-    DeepLinkHandlerContext context,
-  ) async {
+  Future<bool> dispatch({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     for (final handler in _handlers) {
       if (!handler.canHandle(intent)) continue;
 
@@ -25,7 +25,7 @@ class DeepLinkDispatcher {
         return true;
       }
 
-      await handler.handle(intent, context);
+      await handler.handle(context: context, intent: intent);
       await context.pendingStore.clearPending();
       return true;
     }

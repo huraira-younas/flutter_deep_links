@@ -94,7 +94,10 @@ class ProfileHandler extends DeepLinkHandler {
   bool canHandle(DeepLinkIntent intent) => intent is ProfileIntent;
 
   @override
-  Future<void> handle(DeepLinkIntent intent, DeepLinkHandlerContext context) async {
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     final profile = intent as ProfileIntent;
     // Navigate to profile screen using profile.userId
   }
@@ -108,7 +111,10 @@ class InviteHandler extends DeepLinkHandler {
   bool canHandle(DeepLinkIntent intent) => intent is InviteIntent;
 
   @override
-  Future<void> handle(DeepLinkIntent intent, DeepLinkHandlerContext context) async {
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  }) async {
     final invite = intent as InviteIntent;
     // Handle invite using invite.inviteCode
   }
@@ -216,6 +222,32 @@ class SharedPrefsPendingStore implements DeepLinkPendingStore {
 }
 ```
 
+### Dispatcher
+
+`DeepLinkOrchestrator` creates a `DeepLinkDispatcher` by default. You can supply your own with an optional named `handlers` list, or register handlers later via `registerHandler`:
+
+```dart
+DeepLinkOrchestrator(
+  sources: [AppLinksDeepLinkSource()],
+  dispatcher: DeepLinkDispatcher(
+    handlers: [ProfileHandler(), InviteHandler()],
+  ),
+);
+```
+
+To call the dispatcher yourself (e.g. in tests), use named arguments on `dispatch`:
+
+```dart
+final handled = await dispatcher.dispatch(
+  context: DeepLinkHandlerContext(
+    pendingStore: pendingStore,
+    authPolicy: authPolicy,
+    sharedData: const {},
+  ),
+  intent: resolvedIntent,
+);
+```
+
 ### Logging
 
 Inject any `DeepLinkLogger`. The default `DeveloperDeepLinkLogger` writes to `dart:developer`'s `log()`. Use `NoopDeepLinkLogger` to silence output, or implement your own.
@@ -257,8 +289,8 @@ DeepLinkOrchestrator(
 | `DeepLinkOrchestrator` | Top-level entry point; wires sources, policies, resolver, and dispatcher. |
 | `DeepLinkIntent` | Abstract base for all intents; extend it with parsed fields. |
 | `RawDeepLinkIntent` | Concrete intent created by sources before resolution. |
-| `DeepLinkHandler` | Abstract handler with `canHandle`, `requiresAuthentication`, and `handle`. |
-| `DeepLinkDispatcher` | Registers handlers and routes intents through the auth gate. |
+| `DeepLinkHandler` | Abstract handler with `canHandle`, `requiresAuthentication`, and `handle(context:, intent:)`. |
+| `DeepLinkDispatcher` | Registers handlers and routes intents through the auth gate; constructor `handlers:`, method `dispatch(context:, intent:)`. |
 | `DeepLinkValidator` | Built-in scheme/host/path validation. |
 | `AppLinksDeepLinkSource` | `app_links` v7 integration (cold + warm start). |
 | `DeepLinkLogger` | Logging interface with `DeveloperDeepLinkLogger` and `NoopDeepLinkLogger`. |

@@ -6,5 +6,8 @@ abstract class DeepLinkHandler {
 
   bool canHandle(DeepLinkIntent intent);
 
-  Future<void> handle(DeepLinkIntent intent, DeepLinkHandlerContext context);
+  Future<void> handle({
+    required DeepLinkHandlerContext context,
+    required DeepLinkIntent intent,
+  });
 }
