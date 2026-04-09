@@ -135,7 +135,9 @@ class DeepLinkOrchestrator {
       );
 
       if (!handled) {
-        _logger.info(message: 'No handler registered for: ${intent.uri}');
+        _logger.info(
+          message: 'No handler registered for: ${resolved.runtimeType}',
+        );
       }
     } catch (error, stackTrace) {
       _logger.error(
