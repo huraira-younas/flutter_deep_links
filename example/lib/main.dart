@@ -36,9 +36,9 @@ class _DeepLinkExampleAppState extends State<DeepLinkExampleApp> {
     );
 
     _orchestrator.dispatcher.registerHandlers([
+      SettingsHandler(_onSettings),
       ProfileHandler(_onProfile),
       InviteHandler(_onInvite),
-      SettingsHandler(_onSettings),
     ]);
 
     await _orchestrator.initialize();

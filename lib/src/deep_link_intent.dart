@@ -1,6 +1,4 @@
-typedef DeepLinkIntentResolver = DeepLinkIntent Function(
-  DeepLinkIntent intent,
-);
+typedef DeepLinkIntentResolver = DeepLinkIntent Function(DeepLinkIntent intent);
 
 abstract class DeepLinkIntent {
   const DeepLinkIntent({
@@ -14,6 +12,13 @@ abstract class DeepLinkIntent {
   final bool isDeferred;
   final String sourceId;
   final Uri uri;
+
+  Map<String, Object?> toJson() => {
+    'uri': uri.toString(),
+    'sourceId': sourceId,
+    'attributes': attributes,
+    'isDeferred': isDeferred,
+  };
 }
 
 class RawDeepLinkIntent extends DeepLinkIntent {
@@ -23,4 +28,12 @@ class RawDeepLinkIntent extends DeepLinkIntent {
     super.attributes,
     super.isDeferred,
   });
+
+  @override
+  Map<String, Object?> toJson() => {
+    'sourceId': sourceId,
+    'uri': uri.toString(),
+    'attributes': attributes,
+    'isDeferred': isDeferred,
+  };
 }

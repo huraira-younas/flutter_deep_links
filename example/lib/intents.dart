@@ -12,6 +12,9 @@ class ProfileIntent extends DeepLinkIntent {
   });
 
   final String userId;
+
+  @override
+  Map<String, Object?> toJson() => {...super.toJson(), 'userId': userId};
 }
 
 class InviteIntent extends DeepLinkIntent {
@@ -22,6 +25,12 @@ class InviteIntent extends DeepLinkIntent {
   });
 
   final String inviteCode;
+
+  @override
+  Map<String, Object?> toJson() => {
+    ...super.toJson(),
+    'inviteCode': inviteCode,
+  };
 }
 
 class SettingsIntent extends DeepLinkIntent {
@@ -32,6 +41,9 @@ class SettingsIntent extends DeepLinkIntent {
   });
 
   final String? section;
+
+  @override
+  Map<String, Object?> toJson() => {...super.toJson(), 'section': section};
 }
 
 // ---------------------------------------------------------------------------

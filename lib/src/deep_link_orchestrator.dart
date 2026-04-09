@@ -1,3 +1,4 @@
+import 'dart:convert' show jsonEncode;
 import 'dart:async' show Timer;
 
 import 'interfaces/deep_link_source.dart';
@@ -117,7 +118,13 @@ class DeepLinkOrchestrator {
       }
 
       final resolved = _intentResolver?.call(intent) ?? intent;
-      
+      _logger.info(
+        message: jsonEncode({
+          "message": "Dispatching intent: ${intent.uri}",
+          "resolved": resolved.toJson(),
+        }),
+      );
+
       final handled = await _dispatcher.dispatch(
         intent: resolved,
         context: DeepLinkHandlerContext(
