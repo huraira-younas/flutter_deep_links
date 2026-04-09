@@ -16,23 +16,21 @@ class DeepLinkOrchestrator {
     DeepLinkIntentResolver? intentResolver,
     DeepLinkPendingStore? pendingStore,
     DeepLinkDispatcher? dispatcher,
-    
+
     this.debounceDelay = const Duration(milliseconds: 300),
     this.sharedData = const <String, Object?>{},
     DeepLinkLogger? logger,
-  })  : _deduplicationStrategy =
-            deduplicationStrategy ??
-            const DefaultDeepLinkDeduplicationStrategy(),
-        _validationPolicy =
-            validationPolicy ?? const AllowAllDeepLinkValidationPolicy(),
-        _pendingStore = pendingStore ?? const NoopDeepLinkPendingStore(),
-        _authPolicy = authPolicy ?? const AlwaysAuthenticatedPolicy(),
-        _logger = logger ?? const DeveloperDeepLinkLogger(),
-        _dispatcher = dispatcher ?? DeepLinkDispatcher(),
-        _intentResolver = intentResolver,
-        _sources = sources;
-
-  static const String _tag = 'DeepLinkOrchestrator';
+  }) : _deduplicationStrategy =
+           deduplicationStrategy ??
+           const DefaultDeepLinkDeduplicationStrategy(),
+       _validationPolicy =
+           validationPolicy ?? const AllowAllDeepLinkValidationPolicy(),
+       _pendingStore = pendingStore ?? const NoopDeepLinkPendingStore(),
+       _authPolicy = authPolicy ?? const AlwaysAuthenticatedPolicy(),
+       _logger = logger ?? const DeveloperDeepLinkLogger(),
+       _dispatcher = dispatcher ?? DeepLinkDispatcher(),
+       _intentResolver = intentResolver,
+       _sources = sources;
 
   final DeepLinkDeduplicationStrategy _deduplicationStrategy;
   final DeepLinkValidationPolicy _validationPolicy;
@@ -60,10 +58,7 @@ class DeepLinkOrchestrator {
     }
 
     _isInitialized = true;
-    _logger.info(
-      message: 'Initialized ${_sources.length} source(s)',
-      tag: _tag,
-    );
+    _logger.info(message: 'Initialized ${_sources.length} source(s)');
   }
 
   Future<void> dispose() async {
@@ -91,8 +86,7 @@ class DeepLinkOrchestrator {
     }
   }
 
-  Future<void> handleIntent(DeepLinkIntent intent) =>
-      _onIntentReceived(intent);
+  Future<void> handleIntent(DeepLinkIntent intent) => _onIntentReceived(intent);
 
   void resetDeduplication() => _lastFingerprint = null;
 
@@ -110,7 +104,6 @@ class DeepLinkOrchestrator {
     if (_isProcessing) {
       _logger.warn(
         message: 'Skipping deep link — another link is being processed',
-        tag: _tag,
       );
       return;
     }
@@ -119,7 +112,7 @@ class DeepLinkOrchestrator {
     try {
       final reason = _validationPolicy.failureReason(intent.uri);
       if (reason != null) {
-        _logger.warn(message: reason, tag: _tag);
+        _logger.warn(message: reason);
         return;
       }
 
@@ -135,17 +128,13 @@ class DeepLinkOrchestrator {
       );
 
       if (!handled) {
-        _logger.info(
-          message: 'No handler registered for: ${intent.uri}',
-          tag: _tag,
-        );
+        _logger.info(message: 'No handler registered for: ${intent.uri}');
       }
     } catch (error, stackTrace) {
       _logger.error(
         message: 'Failed to process deep link: $error',
         stackTrace: stackTrace,
         error: error,
-        tag: _tag,
       );
     } finally {
       _isProcessing = false;
