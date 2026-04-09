@@ -4,8 +4,8 @@ description: >
   Handles validation, deduplication, authentication gating,
   and dispatching with pluggable sources, policies, and handlers.
 version: 1.0.0
-# TODO: replace with your actual repository URL before publishing
-repository: https://github.com/user/flutter_deep_links
+
+repository: https://github.com/huraira-younas/flutter_deep_links
 
 topics:
   - deep-linking
