@@ -35,11 +35,11 @@ class _DeepLinkExampleAppState extends State<DeepLinkExampleApp> {
       ),
     );
 
-    _orchestrator.dispatcher.registerHandlers([
-      SettingsHandler(_onSettings),
-      ProfileHandler(_onProfile),
-      InviteHandler(_onInvite),
-    ]);
+    _orchestrator.dispatcher.registerHandlers({
+      SettingsIntent: SettingsHandler(_onSettings),
+      ProfileIntent: ProfileHandler(_onProfile),
+      InviteIntent: InviteHandler(_onInvite),
+    });
 
     await _orchestrator.initialize();
     await _orchestrator.checkInitialIntent();

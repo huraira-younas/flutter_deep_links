@@ -125,7 +125,7 @@ class DeepLinkOrchestrator {
         }),
       );
 
-      final handled = await _dispatcher.dispatch(
+      await _dispatcher.dispatch(
         intent: resolved,
         context: DeepLinkHandlerContext(
           pendingStore: _pendingStore,
@@ -133,12 +133,6 @@ class DeepLinkOrchestrator {
           sharedData: sharedData,
         ),
       );
-
-      if (!handled) {
-        _logger.info(
-          message: 'No handler registered for: ${resolved.runtimeType}',
-        );
-      }
     } catch (error, stackTrace) {
       _logger.error(
         message: 'Failed to process deep link: ${intent.uri}',

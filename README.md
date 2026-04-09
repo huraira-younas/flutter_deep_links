@@ -134,9 +134,10 @@ final orchestrator = DeepLinkOrchestrator(
   ),
 );
 
-orchestrator.dispatcher
-  ..registerHandler(ProfileHandler())
-  ..registerHandler(InviteHandler());
+orchestrator.dispatcher.registerHandlers({
+  ProfileIntent: ProfileHandler(...),
+  InviteIntent: InviteHandler(...),
+});
 
 await orchestrator.initialize();
 await orchestrator.checkInitialIntent();
@@ -174,7 +175,7 @@ await orchestrator.dispose();
 2. **Orchestrator** debounces rapid-fire intents, then checks deduplication.
 3. **Validation policy** rejects links with unsupported schemes/hosts/paths.
 4. **Intent resolver** (optional) converts the raw intent into a concrete subclass with parsed fields.
-5. **Dispatcher** finds the first handler where `canHandle` returns `true`. If that handler has `requiresAuthentication == true` and the user isn't authenticated, the link is saved to the **pending store** for later replay. Otherwise, the handler processes the intent.
+5. **Dispatcher** looks up the handler by `intent.runtimeType` in its map, then confirms `canHandle`. If that handler has `requiresAuthentication == true` and the user isn't authenticated, the link is saved to the **pending store** for later replay. Otherwise, the handler processes the intent.
 
 ## Configuration
 
@@ -224,13 +225,16 @@ class SharedPrefsPendingStore implements DeepLinkPendingStore {
 
 ### Dispatcher
 
-`DeepLinkOrchestrator` creates a `DeepLinkDispatcher` by default. You can supply your own with an optional named `handlers` list, or register handlers later via `registerHandler`:
+`DeepLinkOrchestrator` creates a `DeepLinkDispatcher` by default. You can supply your own with an optional named `handlers` map (`Type` → `DeepLinkHandler`), or register handlers later via `registerHandler` / `registerHandlers`:
 
 ```dart
 DeepLinkOrchestrator(
   sources: [AppLinksDeepLinkSource()],
   dispatcher: DeepLinkDispatcher(
-    handlers: [ProfileHandler(), InviteHandler()],
+    handlers: {
+      ProfileIntent: ProfileHandler(...),
+      InviteIntent: InviteHandler(...),
+    },
   ),
 );
 ```
@@ -290,7 +294,7 @@ DeepLinkOrchestrator(
 | `DeepLinkIntent` | Abstract base for all intents; extend it with parsed fields. |
 | `RawDeepLinkIntent` | Concrete intent created by sources before resolution. |
 | `DeepLinkHandler` | Abstract handler with `canHandle`, `requiresAuthentication`, and `handle(context:, intent:)`. |
-| `DeepLinkDispatcher` | Registers handlers and routes intents through the auth gate; constructor `handlers:`, method `dispatch(context:, intent:)`. |
+| `DeepLinkDispatcher` | Registers handlers in a `Map<Type, DeepLinkHandler>` for O(1) dispatch by `intent.runtimeType`; constructor `handlers:`, methods `registerHandler`, `registerHandlers`, `dispatch(context:, intent:)`. |
 | `DeepLinkValidator` | Built-in scheme/host/path validation. |
 | `AppLinksDeepLinkSource` | `app_links` v7 integration (cold + warm start). |
 | `DeepLinkLogger` | Logging interface with `DeveloperDeepLinkLogger` and `NoopDeepLinkLogger`. |
