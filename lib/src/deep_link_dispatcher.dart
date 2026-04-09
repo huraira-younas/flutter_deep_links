@@ -8,6 +8,10 @@ class DeepLinkDispatcher {
 
   final List<DeepLinkHandler> _handlers;
 
+  void registerHandlers(List<DeepLinkHandler> handlers) {
+    _handlers.addAll(handlers);
+  }
+
   void registerHandler(DeepLinkHandler handler) {
     _handlers.add(handler);
   }

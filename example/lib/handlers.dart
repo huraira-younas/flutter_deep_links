@@ -4,6 +4,9 @@ import 'package:flutter_deep_links/flutter_deep_links.dart';
 import 'intents.dart';
 
 class ProfileHandler extends DeepLinkHandler {
+  @override
+  bool get requiresAuthentication => false;
+
   ProfileHandler(this.onNavigate);
 
   final void Function(String userId) onNavigate;
@@ -45,6 +48,9 @@ class InviteHandler extends DeepLinkHandler {
 }
 
 class SettingsHandler extends DeepLinkHandler {
+  @override
+  bool get requiresAuthentication => false;
+
   SettingsHandler(this.onNavigate);
 
   final void Function(String? section) onNavigate;
@@ -58,7 +64,9 @@ class SettingsHandler extends DeepLinkHandler {
     required DeepLinkIntent intent,
   }) async {
     final settings = intent as SettingsIntent;
-    debugPrint('[SettingsHandler] Opening settings: ${settings.section ?? "root"}');
+    debugPrint(
+      '[SettingsHandler] Opening settings: ${settings.section ?? "root"}',
+    );
     onNavigate(settings.section);
   }
 }
