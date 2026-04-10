@@ -51,6 +51,34 @@ class DefaultDeepLinkDeduplicationStrategy
       '${intent.sourceId}:${intent.uri}';
 }
 
+class TimeWindowDeepLinkDeduplicationStrategy
+    implements DeepLinkDeduplicationStrategy {
+  TimeWindowDeepLinkDeduplicationStrategy({
+    this.windowDuration = const Duration(seconds: 1),
+  });
+
+  final Duration windowDuration;
+
+  String? _lastEmittedFingerprint;
+  String? _lastSemanticKey;
+  DateTime? _expiresAt;
+
+  @override
+  String fingerprintOf(DeepLinkIntent intent) {
+    final semanticKey = '${intent.sourceId}:${intent.uri}';
+    final now = DateTime.now();
+
+    if (_lastSemanticKey == semanticKey && now.isBefore(_expiresAt!)) {
+      return _lastEmittedFingerprint!;
+    }
+
+    _lastSemanticKey = semanticKey;
+    _expiresAt = now.add(windowDuration);
+    return _lastEmittedFingerprint =
+        '$semanticKey#${now.microsecondsSinceEpoch}';
+  }
+}
+
 class NoopDeepLinkPendingStore implements DeepLinkPendingStore {
   const NoopDeepLinkPendingStore();
 

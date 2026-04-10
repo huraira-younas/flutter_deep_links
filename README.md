@@ -206,6 +206,38 @@ class MyAuthPolicy implements DeepLinkAuthenticationPolicy {
 
 When a handler has `requiresAuthentication == true` and the user isn't authenticated, the link URI is saved to the pending store. After login, call `orchestrator.checkInitialIntent()` to replay it.
 
+### Deduplication
+
+The default `DefaultDeepLinkDeduplicationStrategy` deduplicates by `sourceId:uri` forever — a second delivery of the same URI is always dropped until you call `resetDeduplication()`. This soaks up platform double-fires but prevents the user from opening the same link twice.
+
+Use `TimeWindowDeepLinkDeduplicationStrategy` to get time-bounded dedupe: identical intents that arrive within the window are collapsed, but the same URI is handled again once the window expires.
+
+```dart
+DeepLinkOrchestrator(
+  sources: [AppLinksDeepLinkSource()],
+  deduplicationStrategy: TimeWindowDeepLinkDeduplicationStrategy(
+    windowDuration: const Duration(milliseconds: 800),
+  ),
+)
+```
+
+| Scenario | Behavior |
+|----------|----------|
+| Same URI arrives 50 ms after last one | Collapsed — handler runs once |
+| Same URI arrives 5 s after last one | Treated as new open — handler runs again |
+
+Implement `DeepLinkDeduplicationStrategy` for fully custom logic:
+
+```dart
+class MyDeduplicationStrategy implements DeepLinkDeduplicationStrategy {
+  @override
+  String fingerprintOf(DeepLinkIntent intent) {
+    // Return the same string to dedupe, a new string to allow.
+    return '${intent.sourceId}:${intent.uri}';
+  }
+}
+```
+
 ### Pending store
 
 The package ships with `NoopDeepLinkPendingStore` (default) and `InMemoryDeepLinkPendingStore`. For persistence across app restarts, implement `DeepLinkPendingStore` with your own storage:
@@ -305,7 +337,7 @@ DeepLinkOrchestrator(
 |---|---|---|
 | `DeepLinkValidationPolicy` | Accept or reject URIs | `AllowAllDeepLinkValidationPolicy` |
 | `DeepLinkAuthenticationPolicy` | Report auth state | `AlwaysAuthenticatedPolicy` |
-| `DeepLinkDeduplicationStrategy` | Fingerprint intents | `DefaultDeepLinkDeduplicationStrategy` |
+| `DeepLinkDeduplicationStrategy` | Fingerprint intents; built-ins: `DefaultDeepLinkDeduplicationStrategy` (forever) and `TimeWindowDeepLinkDeduplicationStrategy` (time-bounded) | `DefaultDeepLinkDeduplicationStrategy` |
 | `DeepLinkPendingStore` | Persist/replay pending links | `NoopDeepLinkPendingStore` |
 
 ## Platform setup
