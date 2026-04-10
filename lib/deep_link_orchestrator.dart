@@ -1,4 +1,4 @@
-library flutter_deep_links;
+library deep_link_orchestrator;
 
 export 'src/sources/app_links_deep_link_source.dart';
 export 'src/interfaces/deep_link_handler.dart';

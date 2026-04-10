@@ -1,4 +1,4 @@
-import 'package:flutter_deep_links/flutter_deep_links.dart';
+import 'package:deep_link_orchestrator/deep_link_orchestrator.dart';
 
 // ---------------------------------------------------------------------------
 // Concrete intents

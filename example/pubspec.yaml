@@ -1,5 +1,5 @@
-name: flutter_deep_links_example
-description: Example app demonstrating flutter_deep_links usage.
+name: deep_link_orchestrator_example
+description: Example app demonstrating deep_link_orchestrator usage.
 publish_to: none
 
 environment:
@@ -8,5 +8,5 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_deep_links:
+  deep_link_orchestrator:
     path: ../

@@ -1,4 +1,4 @@
-# flutter_deep_links
+# deep_link_orchestrator
 
 A modular, type-safe deep link orchestration package for Flutter. Handles validation, deduplication, authentication gating, and dispatching with pluggable sources, policies, and handlers.
 
@@ -18,7 +18,7 @@ Built on top of [`app_links`](https://pub.dev/packages/app_links) with zero addi
 
 ```yaml
 dependencies:
-  flutter_deep_links: ^1.0.0
+  deep_link_orchestrator: ^1.0.0
 ```
 
 ```bash
@@ -32,7 +32,7 @@ flutter pub get
 Extend `DeepLinkIntent` with concrete types that carry parsed data:
 
 ```dart
-import 'package:flutter_deep_links/flutter_deep_links.dart';
+import 'package:deep_link_orchestrator/deep_link_orchestrator.dart';
 
 class ProfileIntent extends DeepLinkIntent {
   const ProfileIntent({

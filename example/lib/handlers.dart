@@ -1,5 +1,5 @@
+import 'package:deep_link_orchestrator/deep_link_orchestrator.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_deep_links/flutter_deep_links.dart';
 
 import 'intents.dart';
 
