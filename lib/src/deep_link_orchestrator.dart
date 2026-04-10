@@ -7,7 +7,54 @@ import 'deep_link_dispatcher.dart';
 import 'deep_link_logger.dart';
 import 'deep_link_intent.dart';
 
+/// The central coordinator for the deep link pipeline.
+///
+/// [DeepLinkOrchestrator] wires together one or more [DeepLinkSource]s, a
+/// validation policy, a deduplication strategy, an authentication policy, and
+/// a [DeepLinkDispatcher] into a single, managed pipeline.
+///
+/// ## Lifecycle
+///
+/// 1. Construct the orchestrator with your sources and policies.
+/// 2. Register handlers on [dispatcher].
+/// 3. Call [initialize] (typically in `initState` or `main`).
+/// 4. Call [checkInitialIntent] to process any cold-start deep link.
+/// 5. Call [dispose] when the orchestrator is no longer needed.
+///
+/// ## Example
+///
+/// ```dart
+/// final orchestrator = DeepLinkOrchestrator(
+///   sources: [AppLinksDeepLinkSource()],
+///   validationPolicy: DeepLinkValidator(
+///     expectedHost: 'example.com',
+///     customScheme: 'myapp',
+///     supportedPaths: ['/product'],
+///   ),
+/// );
+///
+/// orchestrator.dispatcher.registerHandlers({
+///   ProductIntent: ProductHandler(),
+/// });
+///
+/// await orchestrator.initialize();
+/// await orchestrator.checkInitialIntent();
+/// ```
 class DeepLinkOrchestrator {
+  /// Creates a [DeepLinkOrchestrator].
+  ///
+  /// [sources] must contain at least one [DeepLinkSource].
+  ///
+  /// All policy and strategy parameters are optional; sensible defaults are
+  /// used when omitted:
+  /// - [validationPolicy] defaults to [AllowAllDeepLinkValidationPolicy].
+  /// - [deduplicationStrategy] defaults to
+  ///   [DefaultDeepLinkDeduplicationStrategy].
+  /// - [authPolicy] defaults to [AlwaysAuthenticatedPolicy].
+  /// - [pendingStore] defaults to [NoopDeepLinkPendingStore].
+  /// - [dispatcher] defaults to an empty [DeepLinkDispatcher].
+  /// - [logger] defaults to [DeveloperDeepLinkLogger].
+  /// - [debounceDelay] defaults to 300 ms.
   DeepLinkOrchestrator({
     required List<DeepLinkSource> sources,
 
@@ -38,19 +85,40 @@ class DeepLinkOrchestrator {
   final DeepLinkAuthenticationPolicy _authPolicy;
   final DeepLinkIntentResolver? _intentResolver;
   final DeepLinkPendingStore _pendingStore;
-  final Map<String, Object?> sharedData;
   final DeepLinkDispatcher _dispatcher;
   final List<DeepLinkSource> _sources;
   final DeepLinkLogger _logger;
+
+  /// The delay applied between receiving a raw URI and processing it.
+  ///
+  /// Debouncing prevents duplicate intents that arrive in rapid succession
+  /// (e.g. from multiple platform callbacks) from being processed more than
+  /// once. Defaults to 300 milliseconds.
   final Duration debounceDelay;
+
+  /// Arbitrary data made available to every handler via
+  /// [DeepLinkHandlerContext.sharedData].
+  ///
+  /// Use this map to pass app-level singletons (e.g. a navigator key or a
+  /// service locator) into handlers without coupling them to global state.
+  final Map<String, Object?> sharedData;
 
   bool _isInitialized = false;
   bool _isProcessing = false;
   String? _lastFingerprint;
   Timer? _debounceTimer;
 
+  /// The dispatcher used to route intents to their registered handlers.
+  ///
+  /// Call [DeepLinkDispatcher.registerHandler] or
+  /// [DeepLinkDispatcher.registerHandlers] on this object before calling
+  /// [initialize].
   DeepLinkDispatcher get dispatcher => _dispatcher;
 
+  /// Subscribes all [DeepLinkSource]s to their platform channels.
+  ///
+  /// This method is idempotent: subsequent calls after the first are no-ops.
+  /// Must be awaited before [checkInitialIntent] or [handleIntent].
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -62,6 +130,9 @@ class DeepLinkOrchestrator {
     _logger.info(message: 'Initialized ${_sources.length} source(s)');
   }
 
+  /// Cancels all subscriptions and releases resources held by each source.
+  ///
+  /// After [dispose] returns the orchestrator must not be used again.
   Future<void> dispose() async {
     _debounceTimer?.cancel();
     _isProcessing = false;
@@ -71,6 +142,13 @@ class DeepLinkOrchestrator {
     }
   }
 
+  /// Processes the deep link that cold-started the app, if any.
+  ///
+  /// Iterates through [sources] in order and processes the first non-null
+  /// initial intent it finds. If no source returns an initial intent,
+  /// falls back to any URI stored in the [DeepLinkPendingStore].
+  ///
+  /// Must be called after [initialize].
   Future<void> checkInitialIntent() async {
     for (final source in _sources) {
       final intent = await source.getInitialIntent();
@@ -87,8 +165,17 @@ class DeepLinkOrchestrator {
     }
   }
 
+  /// Manually injects [intent] into the pipeline.
+  ///
+  /// Useful for testing or for forwarding intents from custom platform
+  /// channels that are not modelled as a [DeepLinkSource].
   Future<void> handleIntent(DeepLinkIntent intent) => _onIntentReceived(intent);
 
+  /// Clears the stored deduplication fingerprint.
+  ///
+  /// After this call the next intent will always be processed, even if it
+  /// matches the most recently seen URI. Useful after manual navigation
+  /// resets where re-processing the same link is intentional.
   void resetDeduplication() => _lastFingerprint = null;
 
   Future<void> _onIntentReceived(DeepLinkIntent intent) async {
